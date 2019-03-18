@@ -1,0 +1,68 @@
+
+
+function startTimer() {
+    if (!window.pause){
+        var turn_time_arr = window.turn_time.split(":");
+        var turn_time_m = Number(turn_time_arr[0]);
+        var turn_time_s = Number(turn_time_arr[1]);
+
+        var active_player_time_arr = window.players_time[window.active_player-1].split(":");
+        var active_player_time_m = Number(active_player_time_arr[0]);
+        var active_player_time_s = Number(active_player_time_arr[1]);
+
+        var total_time_arr = window.total_time.split(":");
+        var total_time_h = Number(total_time_arr[0]);
+        var total_time_m = Number(total_time_arr[1]);
+        var total_time_s = Number(total_time_arr[2]);
+
+        turn_time_s++;
+        active_player_time_s++;
+        total_time_s++;
+
+        if (turn_time_s == 60) {
+            turn_time_m++;
+            turn_time_s=0;
+        }
+
+        if (active_player_time_s == 60) {
+            active_player_time_m++;
+            active_player_time_s=0;
+        }
+
+        if (total_time_s == 60) {
+            total_time_m++;
+            total_time_s=0;
+            if (total_time_m == 60) {
+                total_time_h++;
+                total_time_m=0;
+            }
+        }
+
+        if (turn_time_m < 10) turn_time_m = "0" + turn_time_m;
+        if (turn_time_s < 10) turn_time_s = "0" + turn_time_s;
+
+        if (active_player_time_m < 10) active_player_time_m = "0" + active_player_time_m;
+        if (active_player_time_s < 10) active_player_time_s = "0" + active_player_time_s;
+
+        if (total_time_h < 10) total_time_h = "0" + total_time_h;
+        if (total_time_m < 10) total_time_m = "0" + total_time_m;
+        if (total_time_s < 10) total_time_s = "0" + total_time_s;
+
+        window.turn_time = turn_time_m + ":" + turn_time_s
+        window.players_time[window.active_player-1] = active_player_time_m + ":" + active_player_time_s
+        window.total_time = total_time_h + ":" + total_time_m + ":" + total_time_s
+
+        window.game_time_field[0].innerHTML = window.turn_time;
+        window.players_time_field[window.active_player-1].innerHTML = window.players_time[window.active_player-1];
+        window.total_time_field[0].innerHTML = window.total_time;
+        saveSettings()
+        setTimeout(startTimer, 1000);
+
+    }
+}
+
+function saveSettings() {
+    window.sessionStorage.setItem('total_time', window.total_time)
+    window.sessionStorage.setItem('player_time', window.players_time[window.active_player-1])
+    window.sessionStorage.setItem('turn_time', window.turn_time)
+}

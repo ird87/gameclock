@@ -1,0 +1,34 @@
+var baseM = 0.0714286666666667,
+    baseWindowWidth = 1920,
+    baseWindowHeight = 1080,
+    baseFZ = 1,
+    maxFZ = 10,
+    minFZ = .001,
+    resizeTimer,
+    body;
+
+function recalcFZ() {
+    var vw = Math.min(document.documentElement.clientWidth, window.innerWidth || 0),
+        vh = Math.min(document.documentElement.clientHeight, window.innerHeight || 0);
+    var newFZ = Math.min((vw * baseFZ) / baseWindowWidth, (vh * baseFZ) / baseWindowHeight);
+
+    newFZ = Math.max(minFZ, Math.min(newFZ, maxFZ));
+    window.scale_now=newFZ
+
+    body.style.fontSize = ((newFZ > maxFZ ? maxFZ : newFZ) + 'em');
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    body = document.body;
+
+    recalcFZ();
+});
+
+window.onresize = function (event) {
+    clearTimeout(resizeTimer);
+
+    resizeTimer = setTimeout(function () {
+        recalcFZ();
+    }, 50);
+};
+

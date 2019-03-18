@@ -1,0 +1,5 @@
+DB_NAME=db_chess_clock_api_mysql
+DB_USER=postgres
+DB_PASS=postgres
+DB_SERVICE=postgres
+DB_PORT=5432

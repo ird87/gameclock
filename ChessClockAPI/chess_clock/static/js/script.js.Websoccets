@@ -1,0 +1,175 @@
+console.log(window.location)
+var socket_url = 'ws://' + window.location.host + window.location.pathname
+var socket = new WebSocket(socket_url)
+//Теперь определим классы, которые надо изменить
+var clock_holder_shadow_field = document.getElementsByClassName("clock_holder_shadow");
+var players_field = document.getElementsByClassName("player");
+var players_time_field = document.getElementsByClassName("player_time");
+var players_color = document.getElementsByClassName("player_id_text");
+var total_time_field = document.getElementsByClassName("total_time");
+var game_time_field = document.getElementsByClassName("game_time");
+var player_id_text_field = document.getElementsByClassName("player_id_text");
+
+var data_players
+var active_player
+var total_time
+var pause
+var colors
+var players_time
+var turn_time
+var turn_run
+var id
+var color_numbers
+var color_time_turn
+var color_time_turn_outline
+var color_restangles
+var color_player_timer
+
+socket.onmessage = function(event){
+
+
+    //    выгрузим все нужные нам данные
+    var JSON_result = JSON.parse(event.data);
+    var task = JSON_result["task"]
+
+    if (task == "create web"){
+        console.log(event);
+        //  Получаем все необходимые данные из json
+        window.id = JSON_result["game"]["id"]+"";
+        window.data_players = JSON_result["game"]["data players"];
+        window.active_player = JSON_result["game"]["active player"];
+        window.total_time = JSON_result["game"]["total time"];
+        window.pause = JSON_result["game"]["pause"];
+        window.turn_run=JSON_result["game"]["turn_run"];
+        window.colors = JSON_result["players"]["colors"];
+        window.players_time = JSON_result["players"]["players time"];
+        window.turn_time = JSON_result["turn"]["turn time"];
+        window.color_numbers = JSON_result["set_colors"]["color_numbers"];
+        window.color_time_turn = JSON_result["set_colors"]["color_time_turn"];
+        window.color_time_turn_outline = JSON_result["set_colors"]["color_time_turn_outline"];
+        window.color_restangles = JSON_result["set_colors"]["color_restangles"];
+        window.color_player_timer = JSON_result["set_colors"]["color_player_timer"];
+
+        local_id = window.sessionStorage.getItem('id');
+        if (local_id == window.id){
+            window.total_time = window.sessionStorage.getItem('total_time');
+            window.players_time[window.active_player-1] = window.sessionStorage.getItem('player_time');
+            window.turn_time = window.sessionStorage.getItem('turn_time');
+        }else{
+            window.sessionStorage.removeItem('game_over')
+            window.sessionStorage.setItem('id', window.id)
+            window.sessionStorage.setItem('total_time', window.total_time)
+            window.sessionStorage.setItem('player_time', window.players_time[window.active_player-1])
+            window.sessionStorage.setItem('turn_time', window.turn_time)
+        }
+        reload_status();
+        game_over = window.sessionStorage.getItem('game_over')
+        if (game_over == "yes"){
+            set_game_over()
+        }
+    }
+    if (task == "pause_on"){
+        console.log("pause!");
+        window.game_time_field[0].innerHTML = "pause";
+        window.pause=true;
+    }
+        if (task == "pause_off"){
+        console.log("play!")
+        window.pause=false;
+        startTimer();
+    }
+    if (task == "update_status"){
+        console.log(event);
+                //  Получаем все необходимые данные из json
+        window.active_player = JSON_result["game"]["active player"];
+        window.total_time = JSON_result["game"]["total time"];
+        window.pause = JSON_result["game"]["pause"];
+        window.players_time = JSON_result["players"]["players time"];
+        window.turn_time = JSON_result["turn"]["turn time"];
+        reload_status();
+    }
+    if (task == "new_game"){
+        console.log(event);
+        location.reload()
+    }
+    if (task == "game_over"){
+        console.log(event);
+        window.sessionStorage.setItem('game_over', "yes")
+        set_game_over()
+    }
+
+}
+
+socket.onopen = function(event){
+    console.log(event);
+    console.log('socked opened', event);
+
+}
+
+socket.onclose = function(event){
+    console.log('socked closed', event);
+}
+
+function reload_status(){
+    // Установим цвет активного игрока
+        active_color_numbers = window.color_restangles[active_player-1]
+
+        if(active_color_numbers=="#ffffff"){
+            active_color_numbers="#808080"
+        }
+        active_color_time_turn = window.color_time_turn[active_player-1]
+        active_color_time_turn_outline = window.color_time_turn_outline[active_player-1]
+        active_color_restangles = window.color_restangles[active_player-1]
+
+
+
+        // Уберем отображения свойства с активным игроком, и проставим время ходов игроков.
+        for(var i = 0; i < 6; i++){
+            window.players_field[i].classList.remove ("_active");
+            window.players_time_field[i].style.border="none"
+            window.players_time_field[i].innerHTML = window.players_time[i];
+
+        }
+        // Установим все, что связано с активным игрком.
+        // Цвет четырехугольника, в который вписан круг с часами.
+        window.clock_holder_shadow_field[0].style = "background: #fff;background: -moz-radial-gradient(center, ellipse cover, " + active_color_restangles + " 100%, #d9d9d9 100%);background: -webkit-radial-gradient(center, ellipse cover, " + active_color_restangles + " 100%, #d9d9d9 100%);background: radial-gradient(ellipse at center, " + active_color_restangles + " 100%, #d9d9d9 100%);"
+        // Цвет поля длz времени активного игрока
+        console.log(window.scale_now)
+        window.players_time_field[active_player-1].style.border=3.5*window.scale_now+"px solid " + active_color_numbers;
+//        window.players_time_field[active_player-1].style.border-width=2px
+        // Добавим активному игроку свойство _active
+        window.players_field[window.active_player-1].classList.add ("_active");
+        // Установим цвет времени хода в цвет активного игрока
+//        window.game_time_field[0].style = "color: " + active_color_time_turn + ";"
+        //Установим цвет канта врмени хода в цвет активного игрока
+//        game_time.style.setProperty('--webkit-text-stroke-color', active_color_time_turn_outline)
+        if (active_color_time_turn_outline == "none"){
+             window.game_time_field[0].style = "color: " + active_color_time_turn + ";-webkit-text-stroke-width: 0px;-webkit-text-stroke-color: none"
+        }else{
+            window.game_time_field[0].style = "color: " + active_color_time_turn + ";-webkit-text-stroke-width: 1px;-webkit-text-stroke-color:"+ active_color_time_turn_outline
+        }
+
+        //Теперь выведем общее время и текущее. Если таймер на паузе, то выведем "pause"
+        if (window.pause && window.turn_run){
+            window.game_time_field[0].innerHTML = "pause";
+        }else{
+            window.game_time_field[0].innerHTML = window.turn_time
+        }
+        window.total_time_field[0].innerHTML = window.total_time
+
+
+        startTimer()
+}
+
+function set_game_over(){
+        for(var i = 0; i < 6; i++){
+            window.players_field[i].classList.remove ("_active");
+            window.players_time_field[i].removeAttribute("style")
+        }
+        window.game_time_field[0].innerHTML = "Game Over";
+        window.game_time_field[0].style.color = '#fff';
+        window.game_time_field[0].style = "color:black";
+        window.game_time_field[0].style.top = "18.5%"
+        window.clock_holder_shadow_field[0].removeAttribute("style");
+
+}

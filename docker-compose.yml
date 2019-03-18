@@ -1,0 +1,21 @@
+version: '3.5'
+
+services:
+  redis:
+    image: redis
+    command: redis-server
+    ports:
+      - '6379:6379'
+  channels:
+    build: ./ChessClockAPI
+    command: python3 manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./ChessClockAPI:/data
+    depends_on:
+      - db
+    environment:
+     DATABASE_URL: postgres://postgres@db/postgres
+  db:
+    image: postgres:11.2
