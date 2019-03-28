@@ -1,3 +1,6 @@
+import logging
+log = logging.getLogger(__name__)
+
 import json
 
 from asgiref.sync import async_to_sync

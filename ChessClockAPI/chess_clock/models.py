@@ -7,7 +7,7 @@ from colorfield.fields import ColorField
 from chess_clock.shorting import get_short_url
 
 # base_url = "http://multiplayer-clock.herokuapp.com/"
-base_url = "http://127.0.0.1:8000/"
+base_url = "http://gc.tesera.ru/"
 
 #  -----------------------------------------------------------------------------------------------------------------------------
 #  |Player color  |	 Color	      |  GradientA	|  GradientB  |	  Number   |  Time turn	  |  Time turn outline  |  Restangls  |

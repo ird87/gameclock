@@ -1,5 +1,5 @@
 console.log(window.location)
-var socket_url = 'ws://' + window.location.host + window.location.pathname
+var socket_url = 'wss://' + window.location.host + window.location.pathname
 var socket = new WebSocket(socket_url)
 //Теперь определим классы, которые надо изменить
 var clock_holder_shadow_field = document.getElementsByClassName("clock_holder_shadow");

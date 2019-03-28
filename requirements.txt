@@ -1,0 +1,14 @@
+channels
+channels-redis
+Django
+django-colorfield
+dj_database_url
+psycopg2-binary
+daphne
+gunicorn
+pyshorteners
+djangorestframework
+django-filter
+grpcio
+whitenoise
+

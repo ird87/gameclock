@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import sys
+sys.stdout.write("settings.py: start.\n")
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -29,6 +31,47 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '=my^+m94(wnnaipip@mi8ha$7*rs-+
 DEBUG = bool(os.environ.get('DJANGO_DEBUG', True))
 
 ALLOWED_HOSTS = ['*']
+
+import logging, logging.config
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format' : "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+            'datefmt' : "%d/%b/%Y %H:%M:%S"
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'debug.log',
+            'formatter': 'verbose'
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers':['file'],
+            'propagate': True,
+            'level':'DEBUG',
+        },
+        'chess_clock': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+        },
+    }
+}
+
+import logging
+logger = logging.getLogger(__name__)
+logger.debug("this is a test message!")
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -57,11 +100,20 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'ChessClockAPI.urls'
 
+#CHANNEL_LAYERS = {
+#    "default": {
+#        "BACKEND": "channels_redis.core.RedisChannelLayer",
+#        "CONFIG": {
+#             "hosts": [("redis", 6379)],
+#        },
+#    },
+#}
+
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-             "hosts": [("redis", 6379)],
+            "hosts": [("redis://:s0WG66Qp6ztP@gameclock-redis:6379/0")],
         },
     },
 }
@@ -85,16 +137,31 @@ TEMPLATES = [
 # WSGI_APPLICATION = 'ChessClockAPI.wsgi.application'
 ASGI_APPLICATION = 'ChessClockAPI.routing.application'
 
+import dj_database_url
+# DATABASES['default'] =  dj_database_url.config()
+#updated
+DATABASES = {'default': dj_database_url.config(default='postgres://gameclock:s0WG66Qp6ztP@gameclock-postgres/gameclock')}
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-import dj_database_url
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#        'NAME': 'gameclock',
+#        'HOST':  '172.17.0.11',
+#        'PORT' : '5433',
+#        'USER': 'gameclock',
+#        'PASSWORD': 's0WG66Qp6ztP'
+#    }
+#}
 
-DATABASES = {
-    'default': dj_database_url.config()
-}
-
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': 'file::memory:?cache=shared',
+#    }
+#}
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -136,4 +203,5 @@ if DEBUG:
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
